@@ -1,79 +1,70 @@
 <template>
-  <div class="container">
-    <div>
-      <logo />
-      <h1 class="title">
-        project-todo
-      </h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
+  <div>
+    <Header />
+    <Navigation v-if="showNavigation" :dataLength="todoLength" @onSearch="onSearch" />
+    <section class="content">
+      <div class="container">
+        <CardList v-if="todoFormatedData" :cardDatas="todoFormatedData" />
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
+import Header from '~/components/Header.vue'
+import Navigation from '~/components/Navigation.vue'
+import CardList from '~/components/CardList.vue'
+import { buildStoreParam } from '~/utils'
+import { mapState } from 'vuex'
+import {
+  NAMESPACE as TODO_NAMESPACE,
+  ACTION_TYPES as TODO_ACTION_TYPES
+} from '~/store/todo'
 
 export default {
   components: {
-    Logo
+    Header,
+    CardList,
+    Navigation
+  },
+  computed: {
+    ...mapState(TODO_NAMESPACE, ['todoFormatedData', 'todoLength']),
+  },
+  data() {
+    return {
+      showNavigation: this.todoLength !== ''
+    }
+  },
+  mounted() {
+    this.getData()
+  },
+  methods: {
+    async getData() {
+      await this.$store.dispatch(
+        buildStoreParam(
+          TODO_NAMESPACE,
+          TODO_ACTION_TYPES.GET_TODO
+        )
+      )
+    },
+    async onSearch (searchText) {
+      if (searchText) {
+        await this.$store.dispatch(
+          buildStoreParam(
+            TODO_NAMESPACE,
+            TODO_ACTION_TYPES.SEARCH_TODO
+          ),
+          searchText
+        )
+      } else {
+        await this.$store.dispatch(
+          buildStoreParam(
+            TODO_NAMESPACE,
+            TODO_ACTION_TYPES.RESET_DATA
+          )
+        )
+      }
+    }
   }
 }
 </script>
-
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family:
-    'Quicksand',
-    'Source Sans Pro',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
-}
-</style>

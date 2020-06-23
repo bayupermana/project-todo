@@ -30,6 +30,8 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
+    "~plugins/date-filter.js",
+    "~plugins/limit-char.js"
   ],
   /*
   ** Nuxt.js dev-modules
@@ -42,6 +44,7 @@ export default {
   modules: [
     // Doc: https://github.com/nuxt-community/modules/tree/master/packages/bulma
     '@nuxtjs/bulma',
+    '@nuxtjs/axios'
   ],
   /*
   ** Build configuration
